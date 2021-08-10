@@ -1,0 +1,77 @@
+# Converting a project from JavaScript to TypeScript - A Recipe for Success
+​
+One of the most satisfying aspects of TypeScript(TS) is the fact that, when faced with a conversion of codebase from JavaScript(JS) to TS, we can incrementally increase the strictness of type checking. This is great for large scale projects where, in different transitional scenarios, it can feel like an overwhelming and somewhat mammoth task.
+​
+### What not to do
+​
+- Don't change the behaviour of your code alongside converting to TS.
+- Ignore testing - TS allows us to type check our code but does not allow for behaviour. This is still the job of your test suite.
+- Don't try to type things too strongly too early. Convert to TS and then start to increase the strictness.
+​
+## 1. Add TSC
+​
+- Install TS and add a `tsconfig.json` file
+- Add the following into you tsconfig.json file
+​
+```json
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "outDir": <name_of_directory_to_build_to>,
+    },
+    "include": ["src"],
+}
+```
+​
+Note that we haven't yet changed any files to be suffixed by .ts. We have allowed our JS files to be run through the TS compiler and now the codebase uses TS.
+​
+## 2. Enable Typechecking for JavaScript
+​
+This step is optional.
+​
+- Edit the tsconfig.json file to include the following inside the compiler options: -
+​
+```json
+   "checkJs": true,
+   "noImplicitAny": false
+​
+```
+​
+- If you wish, you may also add notes to your JS file that describe the _types_ you expect to assign to variables, parameters and function return values.
+​
+## 2. Compiling in a "looser mode"
+​
+- Ensure all tests pass
+- One at a time, rename .js files to convert to be suffixed with .ts. A side note, don't worry about converting test files just yet.
+- Fix all TS errors
+- Do not change behaviour
+- Once your TS errors are fixed, you may switch the value of `noImplicitAny` to be `true` in your tsconfig.json and handle any TS errors that occur as a consequence. This will uncover any inferred anys which you will now need to explicitly handle with an _any_ type or, preferably, otherwise.
+- Flip the `noImplicitAny` back to `false` and move onto the next file to convert.
+​
+## 3. Make it Strict
+​
+- Once you have converted the bulk of your JS files to TS, you will want to make the most of TS by making all types as strict and therefore as safe as possible.
+- Exclude test files not yet converted and turn on TS strict mode in your `tsconfig.json` within the compiler options like so ...
+​
+```json
+{
+    "compilerOptions": {
+        "strict": true,
+        "allowJs": false,
+        "checkJs": false,
+        "outDir": <name_of_directory_to_build_to>,
+    },
+    "include": ["src"],
+    "exclude": [<name_of_test_folder>]
+}
+```
+​
+- This will ensure _all_ files must be TS for the compiler to run, hence the need to exclude JS test files.
+- Fix all TS errors
+- You may still run your tests but will need to flip `allowJs` to be `true` beforehand.
+​
+Once you have all your JS files converted and running in strict mode you may now, if you wish your test files to also be converted to TS, go ahead and follow the steps through for each one.
+​
+`A note on converting your test files.`
+​
+- Modules work differently in TS, especially when importing and exporting between files. The [TS Docs](https://www.typescriptlang.org/docs/handbook/modules.html) are a great place to begin your research into how to resolve these issues.
