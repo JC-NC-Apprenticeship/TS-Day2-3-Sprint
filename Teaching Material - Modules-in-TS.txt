@@ -1,0 +1,65 @@
+# Modules in TypeScript
+​
+TypeScript interoperates with JavaScript and as such, has to support the various module standards within JS.
+​
+In the early days, JS did not support any sort of module system, meaning everything was declared in a global namespace. For various reasons, this made building large scale applications in JS particularly difficult. To account for this, developers began to _dynamically_ load JS code in the browser, after the page had loaded and using asynchronous module loading, rather than loading everything at once.
+​
+The three criteria necessary for modules to be successful in this asynchronous environment are as follows:-
+​
+1. Modules need to be encapsulated
+2. Dependencies between modules need to be explicit
+3. Every module needs a unique identifier within the application
+​
+Around the same time, Node.js built a module system right into the platform called the CommonJS module standard.
+​
+```js
+const dependency = require("dependency-name");
+const { something } = require("the-path-of-something");
+// requiring something via destructuring the key off the module.exports object
+​
+exports.something = something;
+//exporting something to live on the module.exports object as a property
+​
+module.exports = { something };
+// reassigning the module.exports object to be an object containing a property of something
+```
+​
+The above is common syntax when importing dependencies or packages into our project or to allow for interoperability of variables between files.
+​
+The problem for TypeScript is that this code is not statically analyzable because module.exports and require calls can appear anywhere. The former on can be found on dead branches that have never been reached and the latter is able to contain arbitrary strings and expressions. Thus, it is impossible to statically link a JS program and verify that all referenced files _actually_ exist _and_ export what they say they will.
+​
+Another issue is that the `CommonJS` calls are not ideal for use within the browser.
+​
+## Resolving
+​
+ES2015 introduced a new standard for imports and exports that _is_ statically analyzable. Hurray for TS developers!
+​
+This is the same code as above but utilizes the newer syntax.
+​
+```js
+import dependency from 'dependency-name';
+​
+import { something } from 'the-path-of-something';
+// destructuring something off the export object
+​
+import something from 'the-path-of-something';
+// import something that has been exported as the default from another module
+​
+​
+​
+export something = `whatever something is`;
+// can directly export whatever we want to and add multiples to the export object
+​
+export default something;
+// makes something the only thing exported from a file or module
+```
+​
+## Using commonJS and AMD code
+​
+by default CommonJS defaults dont interoperate with ES2015 default imports, you have to use the widlcard.
+​
+```ts
+import * as fs from "fs";
+```
+​
+however to operate more smoothly you can set `{"esModuleInterop": true}` in your tsconfig's compiler options and we can now leave out the wildcard

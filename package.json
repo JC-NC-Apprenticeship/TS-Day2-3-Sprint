@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/northcoders/ts-converters#readme",
   "devDependencies": {
+    "@types/chai": "^4.2.21",
+    "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.13",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",

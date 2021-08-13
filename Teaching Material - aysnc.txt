@@ -1,0 +1,52 @@
+# Async TypeScript
+​
+So far we have worked with TypeScript (TS) in a Synchronous way. Since the TS server can read the static code, it can mostly infer what the types of things are going to be which is great and saves us a whole load of time and effort!
+​
+When we are working with asynchronous code (e.g. web requests, database requests) the TS server just cannot make it up! We are forced to fill in the gaps.
+​
+A lot of async based libraries you use (including node) will come with types that will provide some level of type inference. This could be as part of the library itself or a TS `@types` folder from the "DefinitelyTyped" community.
+​
+## Callbacks
+​
+If you are constructing functions that accept callbacks, one way to provide a type-safe result is to provide a function type for the `callback` parameter:
+​
+```ts
+import fs from "fs";
+​
+type CatCallback = (
+  error: null | string,
+  cats?: { name: string; owner: string }[]
+) => void;
+​
+function readCats(cb: CatCallback) {
+  fs.readFile("./cats.json", "utf8", (err, data) => {
+    if (err) cb("File Read Error!");
+    else {
+      const cats = JSON.parse(data);
+      cb(null, cats);
+    }
+  });
+}
+​
+readCats((err, cats) => {
+  //cats is inferred!!
+  //do something with the type safe cats
+});
+```
+​
+## Promises
+​
+Most promise based libraries will work in similar ways in that they will provide you some way to type the result of the promise:
+​
+```ts
+//...
+const fetchLukePromise = () => {
+  return axios.get<Character>("https://swapi.dev/api/people/1");
+};
+​
+fetchLukePromise().then(({ data: luke }) => {
+  console.log(`What beautiful ${luke.eye_color} eyes ${luke.name} has!`);
+});
+```
+​
+In this example the we can type the body of the `axios` response by providing them as a generic type parameter (in the crocodile brackets).
